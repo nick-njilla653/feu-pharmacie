@@ -1,0 +1,276 @@
+/* Animations */
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes buttonPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glow {
+  from {
+      box-shadow: 0 0 5px #6c5ce7,
+                  0 0 10px #6c5ce7,
+                  0 0 15px #6c5ce7;
+  }
+  to {
+      box-shadow: 0 0 10px #6c5ce7,
+                  0 0 20px #6c5ce7,
+                  0 0 30px #6c5ce7;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Layout de base */
+ion-content {
+  --background: linear-gradient(-45deg, #ff6b6b, #4ecdc4, #45b7d1, #96c93d);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+ion-header ion-toolbar {
+  --background: linear-gradient(45deg, #6c5ce7, #a363d9);
+}
+
+ion-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: white;
+}
+
+/* Cards */
+ion-card {
+  border-radius: 20px;
+  margin: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.95);
+  transition: transform 0.3s ease;
+}
+
+ion-card:hover {
+  transform: translateY(-5px);
+}
+
+ion-card-content {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Segments */
+ion-segment {
+  background: #f8f9fa;
+  border-radius: 15px;
+  margin: 10px;
+  padding: 5px;
+}
+
+ion-segment-button {
+  --background-checked: #6c5ce7;
+  --color-checked: #ffffff;
+  --indicator-color: #6c5ce7;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+ion-segment-button:hover {
+  --background-hover: rgba(108, 92, 231, 0.1);
+}
+
+/* Input Controls */
+.custom-input {
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  --background: white;
+  margin: 10px 0;
+  font-size: 1.2em;
+}
+
+.custom-input.input-error {
+  border-color: #ff6b6b;
+  animation: shake 0.5s ease-in-out;
+}
+
+.color-picker {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.color-picker:hover {
+  transform: scale(1.1);
+}
+
+/* Matrix Grid */
+.matrix-grid {
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  margin: 20px auto;
+  max-width: 500px;
+}
+
+.matrix-cell {
+  aspect-ratio: 1;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: white;
+}
+
+.matrix-cell:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(108, 92, 231, 0.3);
+}
+
+.matrix-cell.active {
+  background: #6c5ce7;
+  border-color: #5a4bd1;
+  box-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+/* Buttons et Actions */
+.action-buttons,
+.export-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.save-button {
+  --background: #96c93d;
+  --background-hover: #88b82d;
+  --box-shadow: 0 4px 12px rgba(150, 201, 61, 0.3);
+}
+
+.clear-button {
+  --background: #ff6b6b;
+  --background-hover: #ff5252;
+  --box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.preview-button {
+  --background: #4ecdc4;
+  --background-hover: #45b7af;
+  --box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+}
+
+.export-button {
+  --background: #6c5ce7;
+  --background-hover: #5a4bd1;
+  --box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+
+.import-button {
+  --background: #4ecdc4;
+  --background-hover: #45b7af;
+  --box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+}
+
+.action-buttons ion-button:hover,
+.export-buttons ion-button:not(:disabled):hover {
+  animation: buttonPulse 1.5s infinite ease-in-out;
+}
+
+/* Binary Preview */
+.export-preview {
+  margin-top: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.preview-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.preview-section h4 {
+  color: #6c5ce7;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
+.binary-preview {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow-x: auto;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Messages d'erreur */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff6b6b;
+  padding: 10px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .matrix-cell {
+      width: 35px;
+      height: 35px;
+  }
+  
+  .export-preview {
+      grid-template-columns: 1fr;
+  }
+  
+  .action-buttons,
+  .export-buttons {
+      flex-direction: column;
+  }
+  
+  ion-button {
+      width: 100%;
+  }
+  
+  ion-card {
+      margin: 8px;
+  }
+  
+  .binary-preview {
+      font-size: 12px;
+  }
+}
