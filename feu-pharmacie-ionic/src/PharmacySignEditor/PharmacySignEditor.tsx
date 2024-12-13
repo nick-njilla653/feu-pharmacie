@@ -221,9 +221,9 @@ const PharmacySignEditor: React.FC = () => {
             binaryMatrix.push(row);
         }
 
-        // Pour l'E-PROM 1 (colonnes) : par défaut toutes les colonnes sont à 0 (éteintes)
-        let columnPreview = "E-PROM 1 (Contrôle des colonnes - '1' = allumée):\n\n";
-        const columnsData = new Uint8Array(8).fill(0x00); // Initialisation avec tout à 0
+        // Pour l'E-PROM 1 (colonnes) : par défaut toutes les colonnes sont à 1 (éteintes)
+        let columnPreview = "E-PROM 1 (Contrôle des colonnes - '0' = allumée):\n\n";
+        const columnsData = new Uint8Array(8).fill(0xFF); // Initialisation avec tout à 1
 
         // Vérifier chaque colonne
         for (let col = 0; col < 8; col++) {
@@ -236,7 +236,7 @@ const PharmacySignEditor: React.FC = () => {
             }
 
             if (hasActiveLed) {
-                columnsData[col] = (1 << col); // Met à 1 uniquement la colonne active
+                columnsData[col] = ~(1 << col); // Met à 0 uniquement la colonne active
             }
 
             const binaryRep = columnsData[col].toString(2).padStart(8, '0');
@@ -244,15 +244,15 @@ const PharmacySignEditor: React.FC = () => {
             columnPreview += `Col ${col}: ${binaryRep} (0x${hexRep})\n`;
         }
 
-        // Pour l'E-PROM 2 (lignes) : par défaut toutes les lignes sont à 0 (éteintes)
-        let rowPreview = "\nE-PROM 2 (Contrôle des lignes - '1' = allumée):\n\n";
-        const rowsData = new Uint8Array(8).fill(0x00); // Initialisation avec tout à 0
+        // Pour l'E-PROM 2 (lignes) : par défaut toutes les lignes sont à 1 (éteintes)
+        let rowPreview = "\nE-PROM 2 (Contrôle des lignes - '1' = éteinte):\n\n";
+        const rowsData = new Uint8Array(8).fill(0xFF); // Initialisation avec tout à 1
 
         for (let col = 0; col < 8; col++) {
-            let rowByte = 0x00; // On commence avec toutes les lignes éteintes
+            let rowByte = 0xFF; // On commence avec toutes les lignes éteintes
             for (let row = 0; row < 8; row++) {
                 if (binaryMatrix[row][col]) {
-                    rowByte |= (1 << row); // Met à 1 la ligne qui doit être allumée
+                    rowByte &= ~(1 << row); // Met à 0 la ligne qui doit être allumée
                 }
             }
             rowsData[col] = rowByte;
@@ -276,8 +276,8 @@ const PharmacySignEditor: React.FC = () => {
         // Ajouter une explication du balayage
         let explanation = "\nExplication du balayage :\n";
         explanation += "• Le balayage se fait colonne par colonne\n";
-        explanation += "• E-PROM 1 : Active une colonne à la fois (1 = actif)\n";
-        explanation += "• E-PROM 2 : Contrôle les LED par ligne (1 = allumé)\n";
+        explanation += "• E-PROM 1 : Active une colonne à la fois (0 = actif)\n";
+        explanation += "• E-PROM 2 : Contrôle les LED par ligne (1 = éteint)\n";
         explanation += "• La persistance rétinienne crée l'image complète\n";
 
         // Combiner tous les aperçus
@@ -315,7 +315,7 @@ const PharmacySignEditor: React.FC = () => {
 
         if (!binaryString) return;
 
-        // Création du tableau 8x8
+        // Création du tableau 8x8 à partir de la chaîne binaire
         const binaryMatrix = [];
         for (let i = 0; i < 8; i++) {
             const row = [];
@@ -327,10 +327,10 @@ const PharmacySignEditor: React.FC = () => {
         }
 
         // Générer les données pour les colonnes (E-PROM 1)
-        // '1' pour allumer une colonne
-        const columnsData = new Uint8Array(8).fill(0x00); // Initialisation avec tout à 0
+        // '0' pour allumer une colonne
+        const columnsData = new Uint8Array(8);
         for (let col = 0; col < 8; col++) {
-            let colByte = 0x00; // Toutes les colonnes éteintes par défaut
+            let colByte = 0xFF; // Toutes les colonnes éteintes par défaut
 
             // Pour chaque colonne, vérifier s'il y a des LED à allumer
             let hasActiveLed = false;
@@ -341,28 +341,29 @@ const PharmacySignEditor: React.FC = () => {
                 }
             }
 
-            // Si la colonne a des LED actives, on l'allume (mise à 1)
+            // Si la colonne a des LED actives, on l'allume (mise à 0)
             if (hasActiveLed) {
-                colByte = (1 << col);
+                colByte = ~(1 << col);
             }
 
             columnsData[col] = colByte;
         }
 
         // Générer les données pour les lignes (E-PROM 2)
-        // '1' pour allumer une ligne
-        const rowsData = new Uint8Array(8).fill(0x00);
+        // '1' pour éteindre une ligne
+        const rowsData = new Uint8Array(8);
         for (let col = 0; col < 8; col++) {
-            let rowByte = 0x00; // Toutes les lignes éteintes par défaut
+            let rowByte = 0; // Toutes les lignes allumées par défaut
             for (let row = 0; row < 8; row++) {
-                if (binaryMatrix[row][col]) {
-                    rowByte |= (1 << row); // Met à 1 la ligne qui doit être allumée
+                // Si le pixel est inactif dans cette colonne, on éteint la ligne (mise à 1)
+                if (!binaryMatrix[row][col]) {
+                    rowByte |= (1 << row);
                 }
             }
             rowsData[col] = rowByte;
         }
 
-        // Création et téléchargement des fichiers
+        // Création des blobs et téléchargement des fichiers
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const prefix = activeTab === 'text' ? 'text' : 'drawing';
 
