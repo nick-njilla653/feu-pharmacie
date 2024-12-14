@@ -1,6 +1,5 @@
 import './PharmacySignEditor.css';
 import React, { useState } from 'react';
-import { SegmentCustomEvent } from '@ionic/core';
 import {
     IonContent,
     IonPage,
@@ -42,34 +41,18 @@ interface Pattern {
 // Types pour améliorer la sécurité de type
 type SegmentType = 'text' | 'draw';
 
-// Interface pour les événements
-interface IonInputCustomEvent extends CustomEvent {
-    detail: {
-        value?: string | null;
-    };
-}
-
-interface IonSegmentCustomEvent extends CustomEvent {
-    detail: {
-        value: SegmentType;
-    };
-}
-
-interface CustomSegmentChangeEventDetail {
-    value: SegmentType;
-}
 
 // Patterns prédéfinis
 const PREDEFINED_PATTERNS: { [key: string]: number[][] } = {
     'Croix': [
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 0]
+        [1, 1, 0, 0, 0, 0, 1, 1],
+        [1, 1, 1, 0, 0, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 0, 0, 1, 1, 1],
+        [1, 1, 0, 0, 0, 0, 1, 1]
     ],
     'Plus': [
         [0, 0, 0, 1, 1, 0, 0, 0],
@@ -108,7 +91,6 @@ const PharmacySignEditor: React.FC = () => {
     const [text, setText] = useState<string>('');
     const [matrix, setMatrix] = useState<boolean[][]>(Array(8).fill(null).map(() => Array(8).fill(false)));
     const [activeTab, setActiveTab] = useState<'text' | 'draw'>('text');
-    const [currentColor, setCurrentColor] = useState<string>('#00ff00');
     const [showPreview, setShowPreview] = useState<boolean>(false);
     const [binaryPreview, setBinaryPreview] = useState<string>('');
     const [error, setError] = useState<string>('');
@@ -165,12 +147,6 @@ const PharmacySignEditor: React.FC = () => {
         }
     };
 
-
-    const handleTextChange = (e: IonInputCustomEvent): void => {
-        const newText = e.detail.value?.toUpperCase() || '';
-        setText(newText);
-        validateText(newText);
-    };
 
     const handleImport = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const fileInput = event.target;
@@ -403,99 +379,7 @@ const PharmacySignEditor: React.FC = () => {
         setError('');
     };
 
-    // Rendu des composants
-    const renderTextMode = () => (
-        <div className="ion-padding">
-            <IonInput
-                value={text}
-                onIonChange={e => {
-                    const newText = e.detail.value?.toUpperCase() || '';
-                    setText(newText);
-                    validateText(newText);
-                }}
-                placeholder="Entrez votre texte (ex: PHARMACIE)"
-                className={`custom-input ${error ? 'input-error' : ''}`}
-            />
-
-            {error && (
-                <div className="error-message">
-                    <IonIcon icon={alertCircleOutline} />
-                    <span>{error}</span>
-                </div>
-            )}
-        </div>
-    );
-
-    const renderDrawMode = () => (
-        <div className="ion-padding">
-            <IonCard>
-                <IonCardHeader>
-                    <IonCardTitle>Motifs prédéfinis</IonCardTitle>
-                </IonCardHeader>
-                <IonCardContent>
-                    <IonGrid>
-                        <IonRow>
-                            {Object.entries(PREDEFINED_PATTERNS).map(([name, pattern]) => (
-                                <IonCol size="6" size-md="3" key={name}>
-                                    <IonButton
-                                        expand="block"
-                                        fill={selectedPattern === name ? "solid" : "outline"}
-                                        onClick={() => loadPattern(name)}
-                                    >
-                                        {name}
-                                    </IonButton>
-                                </IonCol>
-                            ))}
-                        </IonRow>
-                    </IonGrid>
-                </IonCardContent>
-            </IonCard>
-
-            <div className="matrix-grid">
-                <IonGrid fixed>
-                    {matrix.map((row, i) => (
-                        <IonRow key={i}>
-                            {row.map((cell, j) => (
-                                <IonCol key={`${i}-${j}`}>
-                                    <div
-                                        className={`matrix-cell ${cell ? 'active' : ''}`}
-                                        onClick={() => handleMatrixClick(i, j)}
-                                    />
-                                </IonCol>
-                            ))}
-                        </IonRow>
-                    ))}
-                </IonGrid>
-            </div>
-
-            {savedPatterns.length > 0 && (
-                <div className="ion-padding-top">
-                    <IonCard>
-                        <IonCardHeader>
-                            <IonCardTitle>Motifs sauvegardés</IonCardTitle>
-                        </IonCardHeader>
-                        <IonCardContent>
-                            <IonGrid>
-                                <IonRow>
-                                    {savedPatterns.map((pattern) => (
-                                        <IonCol size="6" size-md="3" key={pattern.timestamp}>
-                                            <IonButton
-                                                expand="block"
-                                                fill={selectedPattern === pattern.name ? "solid" : "outline"}
-                                                onClick={() => loadPattern(pattern)}
-                                            >
-                                                {pattern.name}
-                                            </IonButton>
-                                        </IonCol>
-                                    ))}
-                                </IonRow>
-                            </IonGrid>
-                        </IonCardContent>
-                    </IonCard>
-                </div>
-            )}
-        </div>
-    );
+    
 
     return (
         <IonPage>
